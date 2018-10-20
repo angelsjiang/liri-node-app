@@ -1,3 +1,5 @@
+var fs = require("fs");
+
 // get user command
 var command = process.argv[2];
 // get user input content
@@ -30,14 +32,18 @@ else {
 };
 
 function inquiring(command, usrinput) {
+    console.log(command);
     switch(command) {
         case "concert-this":
             // get moment package
             var moment = require("moment");
             // make query
+            console.log(usrinput + "USRINPUT line 40");
             var queryUrl = "https://rest.bandsintown.com/artists/" + usrinput + "/events?app_id=11d1a33c27c585f40635f47adaf16f47";
+            console.log(queryUrl, "HEREEEEEE");
             var request = require("request");
             request(queryUrl, function(err, response, body) {
+                console.log(response.statusCode, body);
                 if (!err && response.statusCode === 200) {
                     for(var i = 0; i < JSON.parse(body).length; i++) {
                         // get the datetime and convert using moment JS
@@ -45,12 +51,24 @@ function inquiring(command, usrinput) {
                         var convertDate = moment(datetime, moment.ISO_8601);
                         var converted = convertDate.format("MM/DD/YYYY ddd HH:mm")
 
-
+                        var jsonData = JSON.parse(body)[i];
                         // REPORT: console.log everything
                         console.log("\n-------------------\n");
-                        console.log("The name of the venue for " + usrinput + " is " + JSON.parse(body)[i].venue.name + ".");
-                        console.log("The location of the venue is " + JSON.parse(body)[i].venue.city + ", " + JSON.parse(body)[i].venue.country + ".");
-                        console.log("The date of the event at this location is " + converted + ".");
+                        console.log("Venue name for " + usrinput + ": " + jsonData.venue.name + ".");
+                        console.log("Location: " + jsonData.venue.city + ", " + jsonData.venue.country + ".");
+                        console.log("Date: " + converted + ".");
+
+                        var result = [
+                            "Venue name: " + jsonData.venue.name,
+                            "Location: " + jsonData.venue.city + ", " + jsonData.venue.country,
+                            "Date: " + converted,
+                            "\n-------------------\n"
+                        ].join("\n");
+
+                        fs.appendFile("log.txt", result, function(err){
+                            if(err) throw err;
+                            console.log("Content added!");
+                        });
                     }
                 }
             })
@@ -70,11 +88,26 @@ function inquiring(command, usrinput) {
                     .search({type:'track', query: usrinput})
                     .then(function(response) {
                         for(var i = 0; i < response.tracks.items.length; i++) {
+
+                            var jsonData = response.tracks.items[i];
                             console.log("\n--------- Here are searching results --------\n");
-                            console.log("Song name: " + response.tracks.items[i].name);
-                            console.log("Artist: " + response.tracks.items[i].artists[0].name);
-                            console.log("Preview link: " + response.tracks.items[i].external_urls.spotify);
-                            console.log("Album name: " + response.tracks.items[i].album.name);
+                            console.log("Song name: " + jsonData.name);
+                            console.log("Artist: " + jsonData.artists[0].name);
+                            console.log("Preview link: " + jsonData.external_urls.spotify);
+                            console.log("Album name: " + jsonData.album.name);
+
+                            var result = [
+                                "Song name: " + jsonData.name,
+                                "Artist: " + jsonData.artists[0].name,
+                                "Preview link: " + jsonData.external_urls.spotify,
+                                "Album name: " + jsonData.album.name,
+                                "\n-------------------\n"
+                            ].join("\n");
+
+                            fs.appendFile("log.txt", result, function(err){
+                                if(err) throw err;
+                                console.log("Content added!");
+                            });
                         }
                     })
                     .catch(function(err) {
@@ -89,11 +122,26 @@ function inquiring(command, usrinput) {
                     .then(function(response) {
                         for(var i = 0; i < response.tracks.items.length; i++) {
                             if(response.tracks.items[i].artists[0].name === "Ace of Base") {
-                                console.log("\n-------------------\n");
-                                console.log("Song name: " + response.tracks.items[i].name);
-                                console.log("Artist: " + response.tracks.items[i].artists[0].name);
-                                console.log("Preview link: " + response.tracks.items[i].external_urls.spotify);
-                                console.log("Album name: " + response.tracks.items[i].album.name);
+                                console.log("This is the result of The Sign by Ace of Base");
+                                var jsonData = response.tracks.items[i];
+                                console.log("\n--------- Here are searching results --------\n");
+                                console.log("Song name: " + jsonData.name);
+                                console.log("Artist: " + jsonData.artists[0].name);
+                                console.log("Preview link: " + jsonData.external_urls.spotify);
+                                console.log("Album name: " + jsonData.album.name);
+    
+                                var result = [
+                                    "Song name: " + jsonData.name,
+                                    "Artist: " + jsonData.artists[0].name,
+                                    "Preview link: " + jsonData.external_urls.spotify,
+                                    "Album name: " + jsonData.album.name,
+                                    "\n-------------------\n"
+                                ].join("\n");
+    
+                                fs.appendFile("log.txt", result, function(err){
+                                    if(err) throw err;
+                                    console.log("Content added!");
+                                });
                             }
 
                         }
@@ -110,14 +158,16 @@ function inquiring(command, usrinput) {
 
                 request(queryUrl, function(err, response, body) {
 
-                    var title = JSON.parse(body).Title;
-                    var year = JSON.parse(body).Year;
-                    var imdbRating = JSON.parse(body).imdbRating;
-                    var rotten = JSON.parse(body).Ratings[1].Value;
-                    var country = JSON.parse(body).Country;
-                    var language = JSON.parse(body).Language;
-                    var plot = JSON.parse(body).Plot;
-                    var actors = JSON.parse(body).Actors;
+                    var jsonData = JSON.parse(body);
+
+                    var title = jsonData.Title;
+                    var year = jsonData.Year;
+                    var imdbRating = jsonData.imdbRating;
+                    var rotten = jsonData.Ratings[1].Value;
+                    var country = jsonData.Country;
+                    var language = jsonData.Language;
+                    var plot = jsonData.Plot;
+                    var actors = jsonData.Actors;
 
                     if(!err && response.statusCode === 200) {
                         console.log("\n-------------------\n");
@@ -129,6 +179,23 @@ function inquiring(command, usrinput) {
                         console.log("Language: " + language);
                         console.log("Plot: \n" + plot);
                         console.log("Actors: \n" + actors);
+
+                        var result = [
+                            "Title: " + title,
+                            "Year came out: " + year,
+                            "imdb Rating: " + imdbRating,
+                            "Rotten tomatoes Rating: " + rotten,
+                            "Country: " + country,
+                            "Language: " + language,
+                            "Plot: \n" + plot,
+                            "Actors: \n" + actors,
+                            "\n-------------------\n"
+                        ].join("\n");
+
+                        fs.appendFile("log.txt", result, function(err){
+                            if(err) throw err;
+                            console.log("Content added!");
+                        });
                     }
                 })
             }
