@@ -8,10 +8,28 @@ for(var i = 3; i < process.argv.length; i++) {
 // condense user inputs
 var usrinput = userinputArr.join("+");
 
-// HOW TO REPEATEDLY CALL THIS???
-inquiring();
+if(command === "do-what-it-says") {
+    var fs = require("fs");
 
-function inquiring() {
+    fs.readFile("random.txt", "utf8", function(err, data) {
+        if(err) {
+            console.log("\n--------------\n");
+            return console.log("Error: " + err);
+        }
+
+        // verifying
+        var str = data.split(",");
+        var action = str[0];
+        var line = str[1];
+
+        inquiring(action, line);
+    });
+}
+else {
+    inquiring(command, usrinput);
+};
+
+function inquiring(command, usrinput) {
     switch(command) {
         case "concert-this":
             // get moment package
@@ -39,7 +57,7 @@ function inquiring() {
 
             break;
 
-        case "spotify-this-song":
+        case "Spotify-this-song":
             // get node spotify package
             var Spotify = require("node-spotify-api");
             // get spotify keys from keys.js
@@ -151,34 +169,6 @@ function inquiring() {
                     }
                 })
             }
-
-            break;
-        
-        case "do-what-it-says":
-            // something
-
-            var fs = require("fs");
-
-            fs.readFile("random.txt", "utf8", function(err, data) {
-                if(err) {
-                    console.log("\n--------------\n");
-                    return console.log("Error: " + err);
-                }
-
-                // verifying
-                console.log(data);
-                var str = data.split(",");
-                var action = str[0];
-                var line = str[1];
-                console.log(str);
-                console.log(action);
-                console.log(line);
-
-                command = action;
-                usrinput = line;
-
-                inquiring();
-            })
 
             break;
     }
