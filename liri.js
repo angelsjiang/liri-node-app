@@ -38,9 +38,8 @@ function inquiring(command, usrinput) {
             // get moment package
             var moment = require("moment");
             // make query
-            console.log(usrinput + "USRINPUT line 40");
             var queryUrl = "https://rest.bandsintown.com/artists/" + usrinput + "/events?app_id=11d1a33c27c585f40635f47adaf16f47";
-            console.log(queryUrl, "HEREEEEEE");
+
             var request = require("request");
             request(queryUrl, function(err, response, body) {
                 console.log(response.statusCode, body);
